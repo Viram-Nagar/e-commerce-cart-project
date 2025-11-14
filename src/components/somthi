@@ -1,0 +1,199 @@
+i am doing assignment for my intership and i build product list and cart page.import { useState } from "react";
+import Products from "./Products";
+import ShoppingCart from "./ShoppingCart";
+
+const INITAIL_PRODUCTS = [
+  {
+    id: 1,
+    name: "Laptop",
+    category: "Electronics",
+    price: 1200,
+    image: "/sincerely-media-CXYPfveiuis-unsplash.jpg",
+  },
+  {
+    id: 2,
+    name: "T-Shirt",
+    category: "Clothing",
+    price: 25,
+    image: "/sincerely-media-CXYPfveiuis-unsplash.jpg",
+  },
+  {
+    id: 3,
+    name: "The Great Gatsby",
+    category: "Books",
+    price: 15,
+    image: "/sincerely-media-CXYPfveiuis-unsplash.jpg",
+  },
+  {
+    id: 4,
+    name: "Smartphone",
+    category: "Electronics",
+    price: 800,
+    image: "/sincerely-media-CXYPfveiuis-unsplash.jpg",
+  },
+  {
+    id: 5,
+    name: "Jeans",
+    category: "Clothing",
+    price: 50,
+    image: "/sincerely-media-CXYPfveiuis-unsplash.jpg",
+  },
+  {
+    id: 6,
+    name: "Sapiens",
+    category: "Books",
+    price: 20,
+    image: "/sincerely-media-CXYPfveiuis-unsplash.jpg",
+  },
+];
+
+const INITAIL_CART = [
+  {
+    id: 1,
+    name: "Laptop",
+    category: "Electronics",
+    price: 1200,
+    image: "/sincerely-media-CXYPfveiuis-unsplash.jpg",
+    qty: 3,
+  },
+  {
+    id: 2,
+    name: "T-Shirt",
+    category: "Clothing",
+    price: 25,
+    image: "/sincerely-media-CXYPfveiuis-unsplash.jpg",
+    qty: 3,
+  },
+];
+
+function Page() {
+  const [products, setProducts] = useState(INITAIL_PRODUCTS);
+  const [shoppingCart, setShoppingCart] = useState(INITAIL_CART);
+  return (
+    <div>
+      <Products
+        products={products}
+        setProducts={setProducts}
+        shoppingCart={shoppingCart}
+        setShoppingCart={setShoppingCart}
+      />
+      <ShoppingCart
+        shoppingCart={shoppingCart}
+        setShoppingCart={setShoppingCart}
+      />
+    </div>
+  );
+}
+
+export default Page;
+function ProductCard({ product, shoppingCart, setShoppingCart }) {
+  function handleShoppingCart() {
+    const newCartItem = { qty: 1, ...product };
+    setShoppingCart((prev) => [newCartItem, ...prev]);
+  }
+
+  return (
+    <div>
+      <div>
+        <img src={product.image} alt="image" width={200} height={200} />
+        <h2>{product.name}</h2>
+        <p>$ {product.price}</p>
+      </div>
+      <div>
+        {shoppingCart.find((i) => product.id === i.id) ? (
+          <p>Product is already in Cart</p>
+        ) : (
+          <button onClick={handleShoppingCart}>Add to cart</button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default ProductCard;
+import ProductCard from "./ProductCard";
+
+function Products({ products, setProducts, shoppingCart, setShoppingCart }) {
+  return (
+    <div>
+      {products.map((product) => (
+        <ProductCard
+          key={product.id}
+          product={product}
+          shoppingCart={shoppingCart}
+          setShoppingCart={setShoppingCart}
+        />
+      ))}
+    </div>
+  );
+}
+
+export default Products;
+function ShoppingCart({ shoppingCart, setShoppingCart }) {
+  const total = shoppingCart.reduce((sum, i) => i.price * i.qty + sum, 0);
+
+  function handleRemoveItemFromCart(id) {
+    setShoppingCart((prev) => prev.filter((item) => item.id !== id));
+  }
+
+  function handleIncreaseQtyOfProduct(id) {
+    setShoppingCart((prev) => {
+      const updatedCart = prev.map((item) =>
+        item.id === id ? { ...item, qty: item.qty + 1 } : item
+      );
+
+      return updatedCart;
+    });
+  }
+
+  function handleDecreaseQtyOfProduct(id) {
+    setShoppingCart((prev) => {
+      const item = prev.find((i) => i.id === id);
+
+      if (!item) return prev;
+
+      if (item.qty === 1) return prev.filter((i) => i.id !== id);
+
+      return prev.map((i) => (i.id === id ? { ...i, qty: i.qty - 1 } : i));
+    });
+  }
+  return (
+    <div>
+      <div>
+        <h1>Shopping Cart</h1>
+      </div>
+      <div>
+        {shoppingCart ? (
+          shoppingCart.map((item) => (
+            <div key={item.id}>
+              <p>
+                <span>{item.name}</span>
+                <span>
+                  <button onClick={() => handleDecreaseQtyOfProduct(item.id)}>
+                    -
+                  </button>
+                  {item.qty}
+                  <button onClick={() => handleIncreaseQtyOfProduct(item.id)}>
+                    +
+                  </button>
+                </span>
+              </p>
+              <p>
+                <span>{item.qty}(qty)</span> X <span>{item.price}</span> ={" "}
+                <span>{item.qty * item.price}</span>
+              </p>
+              <button onClick={() => handleRemoveItemFromCart(item.id)}>
+                Remove item
+              </button>
+            </div>
+          ))
+        ) : (
+          <p>Add Products to cart</p>
+        )}
+      </div>
+      <div>Total : {total}</div>
+    </div>
+  );
+}
+
+export default ShoppingCart; 
